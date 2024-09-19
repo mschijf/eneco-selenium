@@ -64,6 +64,7 @@ class EnecoSelenium(
         driver.close()
         driver.quit()
 
+        log.info("Finish reading new Eneco data")
         return pageSource
 
     }
