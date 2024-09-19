@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: eneco-selenium
+
+eneco:
+  username: retrieve from file or run time parameters
+  password: retrieve from file or run time parameters
