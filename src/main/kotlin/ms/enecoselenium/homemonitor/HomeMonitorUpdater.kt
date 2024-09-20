@@ -1,11 +1,16 @@
 package ms.enecoselenium.homemonitor
 
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+//import okhttp3.*
+//import okhttp3.MediaType.Companion.toMediaType
+//import java.util.concurrent.TimeUnit
+
+
 
 
 @Service
@@ -38,6 +43,8 @@ class HomeMonitorUpdater {
 
         val request = HttpEntity<String>(postObject, headers)
 
+        log.info("Sending eneco update details to home-monitor service")
         restTemplate.postForObject(updatePersonUrl, request, String::class.java)
+        log.info("Request done")
     }
 }
