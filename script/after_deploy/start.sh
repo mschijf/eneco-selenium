@@ -8,6 +8,4 @@ cd ~/Prive/runeneco/
 
 
 program_version=`ls -1 $program*.jar | tail -1`
-java -jar $program_version --spring.profiles.active=prod --spring.config.name=application_prod --server.port=$port
-
-#>> $program-log 2> $program-log &
+java -jar $program_version --spring.profiles.active=prod --spring.config.name=application_prod --server.port=$port > $program-log 2> $program-log &
