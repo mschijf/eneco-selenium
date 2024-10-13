@@ -13,7 +13,6 @@ import java.time.LocalDateTime
 class SchedulerService (
     private val enecoSelenium: EnecoSelenium,
     private val homeMonitorUpdater: HomeMonitorUpdater): CommandLineRunner {
-    private var lastTimeLogLine = LocalDateTime.MIN
     private val waitForNextReadInMinutes = 6*60L
 
     private val log = LoggerFactory.getLogger(SchedulerService::class.java)
@@ -23,27 +22,28 @@ class SchedulerService (
         log.info("Last time Eneco data has been read is ${lastTimeDone.get()}")
     }
 
-    @Scheduled(fixedRate = 60_000)
+    @Scheduled(fixedRate = 15 * 60 * 1000)
     private fun executeUpdate() {
         val now = LocalDateTime.now()
         if (now.minusMinutes(waitForNextReadInMinutes).isAfter(lastTimeDone.get())) {
-            log.info("Last update was ${lastTimeDone.get()}, starting new one")
-            lastTimeDone.set(now)
-            val pageSource = enecoSelenium.scrapeEnecoPage()
-            if (pageSource != null) {
-                homeMonitorUpdater.doTheUpdate(pageSource)
+            if (homeMonitorUpdater.isReachable()) {
+                log.info("Last update was ${lastTimeDone.get()}, starting new one")
+                lastTimeDone.set(now)
+                val pageSource = enecoSelenium.scrapeEnecoPage()
+                if (pageSource != null) {
+                    homeMonitorUpdater.doTheUpdate(pageSource)
+                } else {
+                    log.error("Empty SourcePage result from Eneco")
+                }
             } else {
-                log.error("Empty SourcePage result from Eneco")
+                log.info("Last update was ${lastTimeDone.get()}, but we cannot ping the home-monitor service --> new update postponed")
             }
         } else {
-            if (now.minusMinutes(60).isAfter(lastTimeLogLine)) {
-                log.info("Last update was recently (${lastTimeDone.get()}). Therefore no new update is done")
-                lastTimeLogLine = now
-            }
+            log.info("Last update was recently (${lastTimeDone.get()}). Therefore no new update is done")
         }
     }
 
     override fun run(vararg args: String?) {
-        executeUpdate()
+//        executeUpdate()
     }
 }
