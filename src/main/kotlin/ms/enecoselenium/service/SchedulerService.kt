@@ -22,7 +22,7 @@ class SchedulerService (
         log.info("Last time Eneco data has been read is ${lastTimeDone.get()}")
     }
 
-    @Scheduled(fixedRate = 15 * 60 * 1000)
+    @Scheduled(fixedRate = 60*1_000)
     private fun executeUpdate() {
         val now = LocalDateTime.now()
         if (now.minusMinutes(waitForNextReadInMinutes).isAfter(lastTimeDone.get())) {
@@ -36,10 +36,17 @@ class SchedulerService (
                     log.error("Empty SourcePage result from Eneco")
                 }
             } else {
-                log.info("Last update was ${lastTimeDone.get()}, but we cannot ping the home-monitor service --> new update postponed")
+                logInfoDensed("Cannot reach the home-monitor service --> new update tried after 1 minute")
             }
-        } else {
-            log.info("Last update was recently (${lastTimeDone.get()}). Therefore no new update is done")
+        }
+    }
+
+    private var counter = 15
+    private fun logInfoDensed(msg: String) {
+        counter--
+        if (counter == 0) {
+            log.info(msg)
+            counter = 15
         }
     }
 
