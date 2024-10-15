@@ -7,7 +7,7 @@ class PersistedLocalDateTime (persistetFileName: String) {
     private val file = File(persistetFileName)
 
     fun set(time: LocalDateTime) {
-        file.writeText(time.toString())
+        file.appendText(time.toString()+"\n")
     }
 
     fun get(): LocalDateTime {
@@ -15,7 +15,7 @@ class PersistedLocalDateTime (persistetFileName: String) {
             return LocalDateTime.MIN
         }
 
-        val timeStr = file.readText()
+        val timeStr = file.readLines().last()
         return LocalDateTime.parse(timeStr)
     }
 }
