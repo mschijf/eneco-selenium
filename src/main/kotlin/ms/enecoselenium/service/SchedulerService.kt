@@ -16,24 +16,26 @@ class SchedulerService (
     private val waitForNextReadInMinutes = 6*60L
 
     private val log = LoggerFactory.getLogger(SchedulerService::class.java)
-    private val lastTimeDone = PersistedLocalDateTime()
+    private val nextTimeToScrape = PersistedLocalDateTime("next_time")
 
     init{
-        log.info("Last time Eneco data has been read is ${lastTimeDone.get()}")
+        log.info("Next time Eneco data will be scraped is ${nextTimeToScrape.get()}")
     }
 
     @Scheduled(fixedRate = 60*1_000)
     private fun executeUpdate() {
         val now = LocalDateTime.now()
-        if (now.minusMinutes(waitForNextReadInMinutes).isAfter(lastTimeDone.get())) {
+        if (now.isAfter(nextTimeToScrape.get())) {
             if (homeMonitorUpdater.isReachable()) {
-                log.info("Last update was ${lastTimeDone.get()}, starting new one")
-                lastTimeDone.set(now)
+                log.info("Last update was ${nextTimeToScrape.get()}, starting new one")
                 val pageSource = enecoSelenium.scrapeEnecoPage()
                 if (pageSource != null) {
                     homeMonitorUpdater.doTheUpdate(pageSource)
+                    nextTimeToScrape.set(now.plusMinutes(waitForNextReadInMinutes))
                 } else {
-                    log.error("Empty SourcePage result from Eneco")
+                    //try again in 15 minutes
+                    nextTimeToScrape.set(now.plusMinutes(15))
+                    log.error("Empty SourcePage result from Eneco, try again after 15 minutes")
                 }
             } else {
                 logInfoDensed("Cannot reach the home-monitor service --> new update tried after 1 minute")

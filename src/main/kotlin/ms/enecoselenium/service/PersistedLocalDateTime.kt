@@ -3,11 +3,11 @@ package ms.enecoselenium.service
 import java.io.File
 import java.time.LocalDateTime
 
-class PersistedLocalDateTime {
-    private val file = File("last_time")
+class PersistedLocalDateTime (persistetFileName: String) {
+    private val file = File(persistetFileName)
 
-    fun set(lastTime: LocalDateTime) {
-        file.writeText(lastTime.toString())
+    fun set(time: LocalDateTime) {
+        file.writeText(time.toString())
     }
 
     fun get(): LocalDateTime {
@@ -15,7 +15,7 @@ class PersistedLocalDateTime {
             return LocalDateTime.MIN
         }
 
-        val lastTimeStr = file.readText()
-        return LocalDateTime.parse(lastTimeStr)
+        val timeStr = file.readText()
+        return LocalDateTime.parse(timeStr)
     }
 }
