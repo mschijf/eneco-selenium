@@ -13,7 +13,6 @@ import java.time.LocalDateTime
 class SchedulerService (
     private val enecoSelenium: EnecoSelenium,
     private val homeMonitorUpdater: HomeMonitorUpdater): CommandLineRunner {
-    private val waitForNextReadInMinutes = 6*60L
 
     private val log = LoggerFactory.getLogger(SchedulerService::class.java)
     private val nextTimeToScrape = PersistedLocalDateTime("next_time")
@@ -27,15 +26,14 @@ class SchedulerService (
         val now = LocalDateTime.now()
         if (now.isAfter(nextTimeToScrape.get())) {
             if (homeMonitorUpdater.isReachable()) {
-                log.info("Last update was ${nextTimeToScrape.get()}, starting new one")
+                log.info("Starting new update from Eneco")
                 val pageSource = enecoSelenium.scrapeEnecoPage()
                 if (pageSource != null) {
                     homeMonitorUpdater.doTheUpdate(pageSource)
-                    nextTimeToScrape.set(now.plusMinutes(waitForNextReadInMinutes))
+                    nextTimeToScrape.set(now.plusMinutes(6*60L))
                 } else {
-                    //try again in 15 minutes
-                    nextTimeToScrape.set(now.plusMinutes(15))
                     log.error("Empty SourcePage result from Eneco, try again after 15 minutes")
+                    nextTimeToScrape.set(now.plusMinutes(15))
                 }
             } else {
                 logInfoDensed("Cannot reach the home-monitor service --> new update tried after 1 minute")
