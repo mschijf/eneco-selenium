@@ -28,11 +28,11 @@ class SchedulerService (
             if (homeMonitorUpdater.isReachable()) {
                 log.info("Starting new update from Eneco")
                 val pageSource = enecoSelenium.scrapeEnecoPage()
-                if (pageSource != null) {
+                if (pageSource != null && homeMonitorUpdater.pageSourceOk(pageSource)) {
                     homeMonitorUpdater.doTheUpdate(pageSource)
                     nextTimeToScrape.set(now.plusMinutes(6*60L))
                 } else {
-                    log.error("Empty SourcePage result from Eneco, try again after 15 minutes")
+                    log.error("Empty SourcePage result from Eneco or sourcePage not correct, try again after 15 minutes")
                     nextTimeToScrape.set(now.plusMinutes(15))
                 }
             } else {

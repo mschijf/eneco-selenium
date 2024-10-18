@@ -25,7 +25,7 @@ class HomeMonitorUpdater {
         return htmlPage.contains(key)
     }
 
-    private fun pageSourceOk(pageSource: String): Boolean {
+    fun pageSourceOk(pageSource: String): Boolean {
         val apiKeyFound = containsKey(pageSource, "FE_DC_API_KEY")
         val accessTokenFound = containsKey(pageSource, "accessToken")
 
@@ -33,11 +33,6 @@ class HomeMonitorUpdater {
     }
 
     fun doTheUpdate(postObject: String) {
-        if (!pageSourceOk(postObject)) {
-            log.error("Page source does not contain accessToken")
-            return
-        }
-
         val updateEnecoUrl = "http://192.168.2.39:8080/eneco/update"
 
         val headers = HttpHeaders()
