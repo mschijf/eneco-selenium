@@ -8,4 +8,6 @@ cd $local_source_path/$path
 rm $local_target_path/$program*.jar
 cp target/$program*.jar $local_target_path
 
+./start.sh
+
 
