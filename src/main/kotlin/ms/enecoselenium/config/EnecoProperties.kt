@@ -6,4 +6,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class EnecoProperties(
     val username: String,
     val password: String,
+    val frequency_in_hours: Long
 )
