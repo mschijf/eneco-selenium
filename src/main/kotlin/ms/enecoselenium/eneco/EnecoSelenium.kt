@@ -3,8 +3,9 @@ package ms.enecoselenium.eneco
 import io.github.bonigarcia.wdm.WebDriverManager
 import ms.enecoselenium.config.EnecoProperties
 import org.openqa.selenium.By
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.WebDriver
+import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.FirefoxOptions
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Duration
@@ -20,25 +21,20 @@ class EnecoSelenium(
 
             log.info("start reading new Eneco data")
 
-            WebDriverManager.chromedriver().setup()
-            val options = ChromeOptions()
-            options.addArguments("--remote-allow-origins=*")
 
-            options.addArguments("--disable-search-engine-choice-screen")
-//        options.addArguments("--start-maximized")
+            // Set the path to GeckoDriver
+            WebDriverManager.firefoxdriver().setup()
+//          System.setProperty("webdriver.gecko.driver", "/usr/bin/geckodriver")
 
-            options.addArguments("--window-size=1920,1080")
-            options.addArguments("--disable-extensions")
-            options.addArguments("--proxy-server='direct://'")
-            options.addArguments("--proxy-bypass-list=*")
-            options.addArguments("--start-maximized")
-            options.addArguments("--disable-gpu")
-            options.addArguments("--disable-dev-shm-usage")
+            // Configure FirefoxOptions
+            val options = FirefoxOptions()
+            options.addArguments("--headless=new")
             options.addArguments("--no-sandbox")
-            options.addArguments("--ignore-certificate-errors")
             options.addArguments("--headless")
 
-            val driver = ChromeDriver(options)
+            // Initialize FirefoxDriver
+            val driver: WebDriver = FirefoxDriver(options)
+
             val url = "https://inloggen.eneco.nl/"
 
             driver.get(url)
@@ -62,11 +58,11 @@ class EnecoSelenium(
 
             val pageSource = driver.pageSource
 
-            driver.close()
             driver.quit()
 
             log.info("Finish reading new Eneco data")
             return pageSource
+
         } catch (e: Exception) {
             log.error("Some error occurred", e)
             return null
