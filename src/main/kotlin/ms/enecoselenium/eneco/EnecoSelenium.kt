@@ -28,7 +28,6 @@ class EnecoSelenium(
 
             // Configure FirefoxOptions
             val options = FirefoxOptions()
-            options.addArguments("--headless=new")
             options.addArguments("--no-sandbox")
             options.addArguments("--headless")
 
